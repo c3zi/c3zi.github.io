@@ -14,10 +14,7 @@ const snake = (function (window, document) {
 
 	const reset = function()
 	{
-		clearSnake();
-		if (bonus) {
-			clearBonus();	
-		}
+		ctx.clearRect(0, 0, 800, 600);
 		document.getElementById('points').innerHTML = 0;
 		
 		snakeBody = [
@@ -55,16 +52,11 @@ const snake = (function (window, document) {
 		}		
 	}
 
-	const clearBonus = function()
-	{
-    	ctx.clearRect(bonus.x-1, bonus.y-1, 17, 17);  	  		
-	}
-
 	const bonusPoint = function()
 	{
 		if (bonus === null) {
-			const randomX = Math.floor(Math.random()*799);
-			const randomY = Math.floor(Math.random()*599);
+			const randomX = Math.floor(Math.random()*745);
+			const randomY = Math.floor(Math.random()*545);
 
 			const pointX = Math.abs(randomX - (randomX % 15));
 			const pointY = Math.abs(randomY - (randomY % 15));
@@ -73,7 +65,7 @@ const snake = (function (window, document) {
 				if (pointX === snakePart.x && pointY === snakePart.y) {
 					console.log('THE SAME');
 					bonusPoint();
-					return;
+					return;	
 				}
 			}
 
