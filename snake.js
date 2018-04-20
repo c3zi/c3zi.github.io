@@ -1,4 +1,5 @@
 const snake = (function (window, document) {
+	const speed = 80;
 	let x = 0;
 	let y = 0;
 	let gameloop;
@@ -36,20 +37,14 @@ const snake = (function (window, document) {
 	{
 		let i = 0;
 		for (const snakePart of snakeBody) {
-			ctx.fillStyle = 'rgb(43, ' + Math.floor(100 +  i)  + ', 71)';
-			// ctx.fillStyle = '#2BB647';
+			if (i < 255) {
+				++i;
+			}
+			ctx.fillStyle = 'rgb(43, ' + Math.floor(255 - i)  + ', 71)';
         	ctx.strokeStyle = '#219538';
         	ctx.strokeRect(snakePart.x, snakePart.y, 15, 15);
         	ctx.fillRect(snakePart.x, snakePart.y, 15, 15);
-        	i++;
 		}
-	}
-
-	const clearSnake = function()
-	{
-		for (const snakePart of snakeBody) {
-	    	ctx.clearRect(snakePart.x-1, snakePart.y-1, 17, 17);  	  
-		}		
 	}
 
 	const bonusPoint = function()
@@ -70,6 +65,7 @@ const snake = (function (window, document) {
 			}
 
 			bonus = {x: pointX, y: pointY};
+			console.log('BONUS: ', bonus);
 		}
 
 		ctx.fillStyle = '#FF5733';
@@ -78,10 +74,37 @@ const snake = (function (window, document) {
     	ctx.strokeRect(bonus.x, bonus.y, 15, 15);
     }
 
+    const recalculateSnake = function(direction) {
+		for (const snakePart of snakeBody) {
+			if (direction === 'right' && snakePart.x >= 800) {
+				snakePart.x = 0;			
+			}
+
+			if (direction === 'left' && snakePart.x < 0) {
+				snakePart.x = 795;				
+			}
+
+			if (direction === 'down' && snakePart.y >= 600) {
+				snakePart.y = 0;
+			}
+
+			if (direction === 'up' && snakePart.y < 0) {
+				snakePart.y = 600;
+			}
+		}
+
+    }
+
+	const clearSnake = function()
+	{
+		for (const snakePart of snakeBody) {
+	    	ctx.clearRect(snakePart.x-1, snakePart.y-1, 17, 17);  	  
+		}		
+	}
+
 	const draw = function(direction)
 	{
-		bonusPoint();
-		const head = snakeBody[snakeBody.length-1];
+		let head = snakeBody[snakeBody.length-1];
 
 		let x = head.x;
 		let y = head.y;
@@ -102,7 +125,7 @@ const snake = (function (window, document) {
 			x -= 15;
 		}
 
-		if (x > 800 || x < 0 || y >= 600 || y < 0 || isCollision(x, y)) {
+		if (isCollision(x, y)) {
 			ctx.font = "italic bold 30px Arial";
 			ctx.textBaseline = "middle";
 			ctx.fillText('GAME OVER', 300, 200);
@@ -112,19 +135,29 @@ const snake = (function (window, document) {
 			return;
 		}
 
+		clearSnake();
+		snakeBody.shift();
+		snakeBody.push({x: x, y: y})
+	
+		recalculateSnake(direction);
+		drawSnake();
+		
+		head = snakeBody[snakeBody.length-1];
+
+		x = head.x;
+		y = head.y;
+		bonusPoint();	
 		if (bonus.x === x && bonus.y === y) {
 			snakeBody.unshift({x: snakeBody[0].x-15, y:0});
 			bonus = null;
 			document.getElementById('points').innerHTML = snakeBody.length - 4;
 		}
 
-		clearSnake();
-		snakeBody.shift();
-		snakeBody.push({x: x, y: y})
-		drawSnake();
+
 	}
 
 	const init = function() {
+
 		const c = document.getElementById("myCanvas");
 		ctx = c.getContext("2d");
 
@@ -144,12 +177,19 @@ const snake = (function (window, document) {
 	        const d = new Date();
 	        const currentTime = d.getTime();
 
-	        if (lastDirectionTime !== null && (currentTime-lastDirectionTime) < 80) {
+	        if (lastDirectionTime !== null && (currentTime-lastDirectionTime) < speed) {
 	        	draw(direction);
 	        	return;
 	        }
 
-	        switch(keyCode) {	      
+	        switch(keyCode) {	  
+	        	case 32:
+	        		clearInterval(gameloop);
+	        		gameloop = null;
+	        		end = true;    
+	        		return false;
+	        		break;
+
 		        case 37: 
 		        	if (direction !== 'right') {
 		        		direction = 'left';			        	
@@ -184,7 +224,7 @@ const snake = (function (window, document) {
 		gameloop = setInterval(function() {
 			draw(direction);
 
-		}, 80);
+		}, speed);
 	}
 
 	const isCollision = function (x, y) {
