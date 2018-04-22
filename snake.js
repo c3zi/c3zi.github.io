@@ -50,7 +50,7 @@ const snake = (function (window, document) {
 	const bonusPoint = function()
 	{
 		if (bonus === null) {
-			const randomX = Math.floor(Math.random()*745);
+			const randomX = Math.floor(Math.random()*780);
 			const randomY = Math.floor(Math.random()*545);
 
 			const pointX = Math.abs(randomX - (randomX % 15));
@@ -75,22 +75,22 @@ const snake = (function (window, document) {
     }
 
     const recalculateSnake = function(direction) {
-		for (const snakePart of snakeBody) {
-			if (direction === 'right' && snakePart.x >= 800) {
-				snakePart.x = 0;			
-			}
+    	const index = snakeBody.length - 1;
+		const head = snakeBody[index];
+		if (direction === 'right' && head.x >= 795) {
+			snakeBody[index].x = 0;			
+		}
 
-			if (direction === 'left' && snakePart.x < 0) {
-				snakePart.x = 795;				
-			}
+		if (direction === 'left' && head.x < 0) {
+			snakeBody[index].x = 795;
+		}
 
-			if (direction === 'down' && snakePart.y >= 600) {
-				snakePart.y = 0;
-			}
+		if (direction === 'down' && head.y >= 600) {
+			snakeBody[index].y = 0;
+		}
 
-			if (direction === 'up' && snakePart.y < 0) {
-				snakePart.y = 600;
-			}
+		if (direction === 'up' && head.y < 0) {
+			snakeBody[index].y = 585;
 		}
 
     }
@@ -142,10 +142,6 @@ const snake = (function (window, document) {
 		recalculateSnake(direction);
 		drawSnake();
 		
-		head = snakeBody[snakeBody.length-1];
-
-		x = head.x;
-		y = head.y;
 		bonusPoint();	
 		if (bonus.x === x && bonus.y === y) {
 			snakeBody.unshift({x: snakeBody[0].x-15, y:0});
