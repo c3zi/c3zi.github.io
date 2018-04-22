@@ -82,7 +82,7 @@ const snake = (function (window, document) {
 		}
 
 		if (direction === 'left' && head.x < 0) {
-			snakeBody[index].x = 795;
+			snakeBody[index].x = 780;
 		}
 
 		if (direction === 'down' && head.y >= 600) {
